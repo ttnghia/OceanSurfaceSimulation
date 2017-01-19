@@ -1,0 +1,11 @@
+prefix=/Users/nghia/Programming/Waooo/Projects/FFTOceanSimulation/Libs/fftw-3.3.5
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: FFTW
+Description: fast Fourier transform library
+Version: 3.3.5
+Libs: -L${libdir} -lfftw3f 
+Libs.private: -lm
+Cflags: -I${includedir}
