@@ -202,8 +202,8 @@ void FFTOceanWidget::initializeGL()
                             wave_amplitude, 1, 4);
 
 
-    camera.setDefaultCamera(glm::vec3(0.95, 4.35, 8.58),
-                            glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    m_Camera.setDefaultCamera(glm::vec3(0.95, 4.35, 8.58),
+                              glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 }
 
@@ -219,7 +219,7 @@ void FFTOceanWidget::paintGL()
 
     ////////////////////////////////////////////////////////////////////////////////
 
-//    qDebug() << camera.cameraPosition.x << camera.cameraPosition.y << camera.cameraPosition.z;
+//    qDebug() << m_Camera.cameraPosition.x << m_Camera.cameraPosition.y << m_Camera.cameraPosition.z;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -243,8 +243,8 @@ void FFTOceanWidget::renderWave()
     GLint lightPosLoc = glGetUniformLocation(lightingShader->programID, "light.position");
     GLint viewPosLoc = glGetUniformLocation(lightingShader->programID, "viewPos");
     glUniform3f(lightPosLoc, lampPos.x, lampPos.y, lampPos.z);
-    glUniform3f(viewPosLoc, camera.cameraPosition.x, camera.cameraPosition.y,
-                camera.cameraPosition.z);
+    glUniform3f(viewPosLoc, m_Camera.m_CameraPosition.x, m_Camera.m_CameraPosition.y,
+                m_Camera.m_CameraPosition.z);
     glUniform1f(glGetUniformLocation(lightingShader->programID, "heightMin"),
                 heightMin * modelScale);
     glUniform1f(glGetUniformLocation(lightingShader->programID, "heightMax"),
@@ -262,8 +262,8 @@ void FFTOceanWidget::renderWave()
 
     // Create camera transformations
 //    glm::mat4 view = glm::mat4(1.0);
-    glm::mat4 view = camera.getViewMatrix();
-    glm::mat4 projection = camera.getProjectionMatrix();
+    glm::mat4 view = m_Camera.getViewMatrix();
+    glm::mat4 projection = m_Camera.getProjectionMatrix();
     // Get the uniform locations
     GLint modelLoc = glGetUniformLocation(lightingShader->programID, "model");
     GLint viewLoc  = glGetUniformLocation(lightingShader->programID, "view");
@@ -296,8 +296,8 @@ void FFTOceanWidget::renderLightSource()
     GLint viewLoc  = glGetUniformLocation(lampShader->programID, "view");
     GLint projLoc  = glGetUniformLocation(lampShader->programID, "projection");
     // Set matrices
-    glm::mat4 view = camera.getViewMatrix();
-    glm::mat4 projection = camera.getProjectionMatrix();
+    glm::mat4 view = m_Camera.getViewMatrix();
+    glm::mat4 projection = m_Camera.getProjectionMatrix();
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
     glm::mat4 model = glm::mat4();
