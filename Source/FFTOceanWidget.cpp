@@ -1,34 +1,28 @@
-//------------------------------------------------------------------------------------------
-//            .-..-.
-//           (-o/\o-)
-//          /`""``""`\
-//          \ /.__.\ /
-//           \ `--` /                                                 Created on: 9/17/2016
-//            `)  ('                                                    Author: Nghia Truong
-//         ,  /::::\  ,
-//         |'.\::::/.'|
-//        _|  ';::;'  |_
-//       (::)   ||   (::)                       _.
-//        "|    ||    |"                      _(:)
-//         '.   ||   .'                       /::\
-//           '._||_.'                         \::/
-//            /::::\                         /:::\
-//            \::::/                        _\:::/
-//             /::::\_.._  _.._  _.._  _.._/::::\
-//             \::::/::::\/::::\/::::\/::::\::::/
-//               `""`\::::/\::::/\::::/\::::/`""`
-//                    `""`  `""`  `""`  `""`
-//------------------------------------------------------------------------------------------
-#include <glm/gtc/matrix_transform.hpp>
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//
+//  Copyright (c) 2017 by
+//       __      _     _         _____
+//    /\ \ \__ _| |__ (_) __ _  /__   \_ __ _   _  ___  _ __   __ _
+//   /  \/ / _` | '_ \| |/ _` |   / /\/ '__| | | |/ _ \| '_ \ / _` |
+//  / /\  / (_| | | | | | (_| |  / /  | |  | |_| | (_) | | | | (_| |
+//  \_\ \/ \__, |_| |_|_|\__,_|  \/   |_|   \__,_|\___/|_| |_|\__, |
+//         |___/                                              |___/
+//
+//  <nghiatruong.vn@gmail.com>
+//  All rights reserved.
+//
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 #include "FFTOceanWidget.h"
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FFTOceanWidget::setupTweakBar()
 {
 }
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FFTOceanWidget::initBufferObjects()
 {
     assert(isValid());
@@ -65,7 +59,7 @@ void FFTOceanWidget::initBufferObjects()
     delete[] indices;
 }
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FFTOceanWidget::deleteBufferObjects()
 {
     assert(isValid());
@@ -75,7 +69,7 @@ void FFTOceanWidget::deleteBufferObjects()
     glDeleteBuffers(1, &surfaceEBO);
 }
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FFTOceanWidget::buildTessendorfWaveMesh(float ftime)
 {
     unsigned int M = mesh_resolution.x;
@@ -112,12 +106,12 @@ void FFTOceanWidget::buildTessendorfWaveMesh(float ftime)
     glEnableVertexAttribArray(1);
 }
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FFTOceanWidget::initializeGL()
 {
     OpenGLWidget::initializeGL();
-    lightingShader = new QtAppShader;
-    lampShader = new QtAppShader;
+    lightingShader = new QtAppShaderProgram;
+    lampShader = new QtAppShaderProgram;
 
 #ifdef __APPLE__
     lightingShader->addVertexShaderFromFile("/Users/nghia/Programming/Mango/Projects/FFTOceanSimulation/Shaders/surface.vert");
@@ -202,14 +196,15 @@ void FFTOceanWidget::initializeGL()
                             wave_amplitude, 1, 4);
 
 
-    m_Camera.setDefaultCamera(glm::vec3(0.95, 4.35, 8.58),
-                              glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    m_Camera->setDefaultCamera(glm::vec3(0.95, 4.35, 8.58),
+                               glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 }
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FFTOceanWidget::paintGL()
 {
+    m_FPSCounter.countFrame();
     startFrameTimer();
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +214,7 @@ void FFTOceanWidget::paintGL()
 
     ////////////////////////////////////////////////////////////////////////////////
 
-//    qDebug() << m_Camera.cameraPosition.x << m_Camera.cameraPosition.y << m_Camera.cameraPosition.z;
+//    qDebug() << m_Camera->cameraPosition.x << m_Camera->cameraPosition.y << m_Camera->cameraPosition.z;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -235,39 +230,39 @@ void FFTOceanWidget::paintGL()
 
 
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FFTOceanWidget::renderWave()
 {
     lightingShader->bind();
 
-    GLint lightPosLoc = glGetUniformLocation(lightingShader->programID, "light.position");
-    GLint viewPosLoc = glGetUniformLocation(lightingShader->programID, "viewPos");
+    GLint lightPosLoc = glGetUniformLocation(lightingShader->getProgramID(), "light.position");
+    GLint viewPosLoc = glGetUniformLocation(lightingShader->getProgramID(), "viewPos");
     glUniform3f(lightPosLoc, lampPos.x, lampPos.y, lampPos.z);
-    glUniform3f(viewPosLoc, m_Camera.m_CameraPosition.x, m_Camera.m_CameraPosition.y,
-                m_Camera.m_CameraPosition.z);
-    glUniform1f(glGetUniformLocation(lightingShader->programID, "heightMin"),
+    glUniform3f(viewPosLoc, m_Camera->m_CameraPosition.x, m_Camera->m_CameraPosition.y,
+                m_Camera->m_CameraPosition.z);
+    glUniform1f(glGetUniformLocation(lightingShader->getProgramID(), "heightMin"),
                 heightMin * modelScale);
-    glUniform1f(glGetUniformLocation(lightingShader->programID, "heightMax"),
+    glUniform1f(glGetUniformLocation(lightingShader->getProgramID(), "heightMax"),
                 heightMax * modelScale);
 
     // Set lights properties
-    glUniform3f(glGetUniformLocation(lightingShader->programID, "light.ambient"), 1.0f, 1.0f,
+    glUniform3f(glGetUniformLocation(lightingShader->getProgramID(), "light.ambient"), 1.0f, 1.0f,
                 1.0f);
-    glUniform3f(glGetUniformLocation(lightingShader->programID, "light.diffuse"), 1.0f, 1.0f,
+    glUniform3f(glGetUniformLocation(lightingShader->getProgramID(), "light.diffuse"), 1.0f, 1.0f,
                 1.0f);
-    glUniform3f(glGetUniformLocation(lightingShader->programID, "light.specular"), 1.0f, 0.9f,
+    glUniform3f(glGetUniformLocation(lightingShader->getProgramID(), "light.specular"), 1.0f, 0.9f,
                 0.7f);
     // Set material properties
-    glUniform1f(glGetUniformLocation(lightingShader->programID, "material.shininess"), 32.0f);
+    glUniform1f(glGetUniformLocation(lightingShader->getProgramID(), "material.shininess"), 32.0f);
 
     // Create camera transformations
 //    glm::mat4 view = glm::mat4(1.0);
-    glm::mat4 view = m_Camera.getViewMatrix();
-    glm::mat4 projection = m_Camera.getProjectionMatrix();
+    glm::mat4 view = m_Camera->getViewMatrix();
+    glm::mat4 projection = m_Camera->getProjectionMatrix();
     // Get the uniform locations
-    GLint modelLoc = glGetUniformLocation(lightingShader->programID, "model");
-    GLint viewLoc  = glGetUniformLocation(lightingShader->programID, "view");
-    GLint projLoc  = glGetUniformLocation(lightingShader->programID, "projection");
+    GLint modelLoc = glGetUniformLocation(lightingShader->getProgramID(), "model");
+    GLint viewLoc  = glGetUniformLocation(lightingShader->getProgramID(), "view");
+    GLint projLoc  = glGetUniformLocation(lightingShader->getProgramID(), "projection");
     // Pass the matrices to the shader
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
@@ -284,7 +279,7 @@ void FFTOceanWidget::renderWave()
     glBindVertexArray(0);
 }
 
-//------------------------------------------------------------------------------------------
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FFTOceanWidget::renderLightSource()
 {
     // ===== Draw Lamp =====
@@ -292,12 +287,12 @@ void FFTOceanWidget::renderLightSource()
     // Also draw the lamp object, again binding the appropriate shader
     lampShader->bind();
     // Get location objects for the matrices on the lamp shader (these could be different on a different shader)
-    GLint modelLoc = glGetUniformLocation(lampShader->programID, "model");
-    GLint viewLoc  = glGetUniformLocation(lampShader->programID, "view");
-    GLint projLoc  = glGetUniformLocation(lampShader->programID, "projection");
+    GLint modelLoc = glGetUniformLocation(lampShader->getProgramID(), "model");
+    GLint viewLoc  = glGetUniformLocation(lampShader->getProgramID(), "view");
+    GLint projLoc  = glGetUniformLocation(lampShader->getProgramID(), "projection");
     // Set matrices
-    glm::mat4 view = m_Camera.getViewMatrix();
-    glm::mat4 projection = m_Camera.getProjectionMatrix();
+    glm::mat4 view = m_Camera->getViewMatrix();
+    glm::mat4 projection = m_Camera->getProjectionMatrix();
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
     glm::mat4 model = glm::mat4();
