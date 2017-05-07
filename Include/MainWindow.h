@@ -15,18 +15,30 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-#include "FFTOMainWindow.h"
-#include "FFTOceanWidget.h"
+#pragma once
+
+#include "OceanRenderWidget.h"
+#include "Controller.h"
+
+#include <QtAppHelpers/OpenGLMainWindow.h>
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-FFTOMainWindow::FFTOMainWindow(QWidget* parent)
-    : OpenGLMainWindow(parent)
+class MainWindow : public OpenGLMainWindow
 {
-    instantiateOpenGLWidget();
-}
+    Q_OBJECT
 
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void FFTOMainWindow::instantiateOpenGLWidget()
-{
-    setupOpenglWidget(new FFTOceanWidget(this));
-}
+public:
+    MainWindow(QWidget* parent = 0);
+
+protected:
+    virtual void instantiateOpenGLWidget();
+
+private:
+    void setupRenderWidgets();
+    void connectWidgets();
+
+    ////////////////////////////////////////////////////////////////////////////////
+    OceanRenderWidget*       m_RenderWidget = nullptr;
+    Controller*              m_Controller   = nullptr;
+    std::shared_ptr<FFTWave> m_WaveModel    = nullptr;
+};

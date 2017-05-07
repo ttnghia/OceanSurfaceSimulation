@@ -1,4 +1,4 @@
-prefix=/Users/nghia/Programming/Waooo/Projects/FFTOceanSimulation/Libs/fftw-3.3.5
+prefix=/Users/nghia/Programming/Waooo/Projects/OceanSimulation/Libs/fftw-3.3.5
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

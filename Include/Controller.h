@@ -15,21 +15,45 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-#include <QApplication>
-#include <QSurfaceFormat>
-#include <QStyle>
-#include <QDesktopWidget>
+#pragma once
 
-#include <tbb/tbb.h>
+#include <QtAppHelpers/MaterialSelector.h>
+#include <QtAppHelpers/EnhancedSlider.h>
+#include <QtAppHelpers/PointLightEditor.h>
+#include <QtAppHelpers/EnhancedComboBox.h>
 
-#include <QtAppHelpers/QtAppMacros.h>
-#include "MainWindow.h"
+#include <QtWidgets>
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-int main(int argc, char* argv[])
+class Controller : public QWidget
 {
-    tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
-    __BNN_UnUsed_Variable(init);
+    Q_OBJECT
+    friend class MainWindow;
+public:
+    explicit Controller(QWidget* parent) : QWidget(parent)
+    {
+        setupGUI();
+    }
 
-    __BNNQt_RunMainWindow(MainWindow, argc, argv, true);
-}
+public slots:
+    void loadTextures();
+
+private:
+    void setupGUI();
+    void setupTextureControllers(QBoxLayout* ctrLayout);
+    void setupColorControllers(QBoxLayout* ctrLayout);
+    void setupWaveControllers(QBoxLayout* ctrLayout);
+    void setupButtons(QBoxLayout* ctrLayout);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    EnhancedComboBox* m_cbSkyTexture;
+    MaterialSelector* m_msSurfaceMaterial;
+    QPushButton*      m_btnReloadTextures;
+    EnhancedSlider*   m_sldWaveResolution;
+    EnhancedSlider*   m_sldTileSize;
+    EnhancedSlider*   m_sldTimeStep;
+    EnhancedSlider*   m_sldNumThreads;
+
+    QPushButton*      m_btnPause;
+    PointLightEditor* m_LightEditor;
+};

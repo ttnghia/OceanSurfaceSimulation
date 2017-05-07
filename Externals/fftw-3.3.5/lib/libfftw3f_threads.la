@@ -17,7 +17,7 @@ old_library='libfftw3f_threads.a'
 inherited_linker_flags=' '
 
 # Libraries that this one depends upon.
-dependency_libs=' /Users/nghia/Programming/Waooo/Projects/FFTOceanSimulation/Libs/fftw-3.3.5/lib/libfftw3f.la -lm'
+dependency_libs=' /Users/nghia/Programming/Waooo/Projects/OceanSimulation/Libs/fftw-3.3.5/lib/libfftw3f.la -lm'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/Users/nghia/Programming/Waooo/Projects/FFTOceanSimulation/Libs/fftw-3.3.5/lib'
+libdir='/Users/nghia/Programming/Waooo/Projects/OceanSimulation/Libs/fftw-3.3.5/lib'

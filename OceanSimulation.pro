@@ -8,22 +8,25 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = FFTOceanSimulation
+TARGET = OceanSimulation
 TEMPLATE = app
 
 
 SOURCES +=\
     Source/Main.cpp \
-    Source/FFTOceanWidget.cpp \
+    Source/OceanRenderWidget.cpp \
     Source/FFTWave.cpp \
-    Source/FFTOMainWindow.cpp
+    Source/MainWindow.cpp \
+    Source/Controller.cpp
 
 HEADERS  += \
-    Include/FFTOceanWidget.h \
+    Include/OceanRenderWidget.h \
     Include/FFTWave.h \
-    Include/FFTOMainWindow.h
+    Include/MainWindow.h \
+    Include/Controller.h \
+    Include/Common.h
 
-include (../../Banana/BananaAppCore/BananaAppCore.pri)
+include (../../Banana/BananaCore/BananaCore.pri)
 include (../../Banana/QtAppHelpers/QtAppHelpers.pri)
 include (../../Banana/OpenGLHelpers/OpenGLHelpers.pri);
 include (../../Banana/ParallelAlgorithms/ParallelAlgorithms.pri)
