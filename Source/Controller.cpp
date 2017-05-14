@@ -108,7 +108,7 @@ void Controller::setupWaveControllers(QBoxLayout* ctrLayout)
     m_sldTileSize->setValue(DEFAULT_TILE_SIZE);
     m_sldTileSize->setTracking(false);
 
-    QGroupBox* tileSizeGroup = new QGroupBox("Tile Size");
+    QGroupBox* tileSizeGroup = new QGroupBox("Tile Size (meter)");
     tileSizeGroup->setLayout(m_sldTileSize->getLayout());
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ void Controller::setupWaveControllers(QBoxLayout* ctrLayout)
     timestepLayout->addLayout(m_sldTimeStep->getLayout(), 0, 0, 1, 5);
     timestepLayout->addWidget(new QLabel("/ 100"), 0, 5, 1, 1);
 
-    QGroupBox* timestepGroup = new QGroupBox("Timestep");
+    QGroupBox* timestepGroup = new QGroupBox("Timestep (second)");
     timestepGroup->setLayout(timestepLayout);
 
     ////////////////////////////////////////////////////////////////////////////////

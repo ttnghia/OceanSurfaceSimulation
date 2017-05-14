@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include <tbb/tbb.h>
-
 #include <QtApphelpers/OpenGLWidget.h>
 #include <OpenGLHelpers/OpenGLBuffer.h>
 #include <OpenGLHelpers/OpenGLTexture.h>
 #include <OpenGLHelpers/RenderObjects.h>
+#include <OpenGLHelpers/MeshObject.h>
+#include <OpenGLHelpers/Material.h>
 #include <QtApphelpers/QtAppShaderProgram.h>
 
 #include "Common.h"
@@ -34,23 +34,21 @@ class OceanRenderWidget : public OpenGLWidget
     Q_OBJECT
 
 public:
-    OceanRenderWidget(QWidget* parent = 0) : OpenGLWidget(parent)
-    {}
-
-    ~OceanRenderWidget() = default;
-
+    OceanRenderWidget(QWidget* parent = 0);
     const std::shared_ptr<FFTWave>& getWaveModel();
 
 public slots:
     void setSkyBoxTexture(int texIndex);
     void setWaveResolution(int resolution);
     void setTimeStep(int timeStep);
+    void updateLights();
+
+signals:
+    void lightsObjChanged(const std::shared_ptr<PointLights>& lights);
 
 protected:
     virtual void initOpenGL() override;
     virtual void renderOpenGL() override;
-    virtual void resizeOpenGLWindow(int, int) override
-    {}
 
 private:
     ////////////////////////////////////////////////////////////////////////////////
@@ -65,20 +63,21 @@ private:
     struct
     {
         std::shared_ptr<QtAppShaderProgram> shader;
+        std::shared_ptr<MeshObject>         surfaceMesh;
+        std::shared_ptr<Material>           surfaceMaterial;
+        std::unique_ptr<MeshRender>         surfaceRender;
 
         bool initialized = false;
     } m_RDataWave;
+
     void updateWave(float ftime);
     void initRDataWave();
     void renderWave();
-    void renderLightSource();
-
 
     ////////////////////////////////////////////////////////////////////////////////
     std::shared_ptr<FFTWave> m_WaveModel = std::make_shared<FFTWave>(DEFAULT_TILE_SIZE, DEFAULT_WAVE_RESOLUTION, DEFAULT_WAVE_AMPLITUDE, DEFAULT_WIN_DIRECTION, DEFAULT_WIN_SPEED, 1.0f, 4);
 
     QtAppShaderProgram* lightingShader;
-    QtAppShaderProgram* lampShader;
 
     int   m_WaveResolution = DEFAULT_WAVE_RESOLUTION;
     float m_TimeStep       = DEFAULT_TIMESTEP;
@@ -87,19 +86,14 @@ private:
     // => rendering variable
     int indexSize;
 
-    GLuint surfaceVAO;
-    GLuint lightVAO;
-
-    GLuint surfaceVBO, surfaceEBO;
-
     float m_ModelScale = 0.01f;
     float m_HeightMax;
     float m_HeightMin;
 
 
     // Light attributes
-    glm::vec3 lampPos;
     glm::vec3 m_SunDirection = DEFAULT_SUN_DIRECTION;
+    glm::vec3 lampPos        = m_SunDirection * 50.0f;
     glm::vec3 m_SunColor     = DEFAULT_SUN_COLOR;
     glm::vec3 m_SeaColor     = DEFAULT_SEA_COLOR;
 

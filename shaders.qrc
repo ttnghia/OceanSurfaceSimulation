@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>Shaders/lamp.frag</file>
-        <file>Shaders/lamp.vert</file>
         <file>Shaders/surface.frag</file>
         <file>Shaders/surface.vert</file>
     </qresource>

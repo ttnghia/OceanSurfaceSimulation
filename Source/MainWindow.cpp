@@ -24,8 +24,9 @@ MainWindow::MainWindow(QWidget* parent) : OpenGLMainWindow(parent)
     setupRenderWidgets();
     connectWidgets();
     setArthurStyle();
-    setWindowTitle("FFT Ocean Simulation");
+    setWindowTitle("Ocean Simulation using Fast Fourier Transform");
     setFocusPolicy(Qt::StrongFocus);
+    showCameraPosition(false);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -58,6 +59,17 @@ void MainWindow::setupRenderWidgets()
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void MainWindow::connectWidgets()
 {
+    ////////////////////////////////////////////////////////////////////////////////
+    // textures
+    connect(m_Controller->m_cbSkyTexture->getComboBox(), SIGNAL(currentIndexChanged(int)), m_RenderWidget, SLOT(setSkyBoxTexture(int)));
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // wave
     connect(m_Controller->m_sldWaveResolution->getSlider(), &QSlider::valueChanged, m_WaveModel.get(), &FFTWave::setWaveResolution);
     connect(m_Controller->m_sldTimeStep->getSlider(),       &QSlider::valueChanged, m_RenderWidget,    &OceanRenderWidget::setTimeStep);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // lights
+    connect(m_Controller->m_LightEditor, &PointLightEditor::lightsChanged,     m_RenderWidget,              &OceanRenderWidget::updateLights);
+    connect(m_RenderWidget,              &OceanRenderWidget::lightsObjChanged, m_Controller->m_LightEditor, &PointLightEditor::setLights);
 }
