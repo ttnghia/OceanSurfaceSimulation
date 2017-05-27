@@ -29,7 +29,6 @@ HEADERS  += \
 include (../../Banana/BananaCore/BananaCore.pri)
 include (../../Banana/QtAppHelpers/QtAppHelpers.pri)
 include (../../Banana/OpenGLHelpers/OpenGLHelpers.pri);
-include (../../Banana/ParallelHelpers/ParallelHelpers.pri)
 
 INCLUDEPATH += $$PWD/Include
 INCLUDEPATH += $$PWD/Externals/fftw-3.3.5/include

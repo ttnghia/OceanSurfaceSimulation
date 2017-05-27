@@ -28,8 +28,5 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 int main(int argc, char* argv[])
 {
-    tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
-    __BNN_UnUsed_Variable(init);
-
     __BNNQt_RunMainWindow(MainWindow, argc, argv, true);
 }

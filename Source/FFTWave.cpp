@@ -22,14 +22,13 @@
 #include <iostream>
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-FFTWave::FFTWave(float tileSize, int waveResolution, float waveAmplitude, const Vec2f& windDirection, float windSpeed, float lambda, int numthreads) :
+FFTWave::FFTWave(float tileSize, int waveResolution, float waveAmplitude, const Vec2f& windDirection, float windSpeed, float lambda) :
     m_TileSize(tileSize),
     m_WaveResolution(waveResolution),
     m_WaveAmplitude(waveAmplitude),
     m_WindDirection(glm::normalize(windDirection)),
     m_WinSpeed(windSpeed),
-    m_Lambda(lambda),
-    m_NumThreads(numthreads)
+    m_Lambda(lambda)
 {
     static_assert(sizeof(std::complex<float> ) == sizeof(fftwf_complex), "Incompatible type: sizeof(float) != sizeof(fftwf_complex");
     m_RandGenerator.seed(static_cast<unsigned int>(time(NULL)));
@@ -91,14 +90,14 @@ void FFTWave::buildHeightField(float time)
                 }
 
                 glm::vec3 normal(sign * m_FFTWData.out_slope_x[index][0],
-                        -1,
-                        sign * m_FFTWData.out_slope_z[index][0]);
+                                 1,
+                                 sign * m_FFTWData.out_slope_z[index][0]);
                 m_NormalField[index] = glm::normalize(normal);
 
                 m_HeightField[index] = glm::vec3(
-                        (static_cast<float>(n) - static_cast<float>(m_WaveResolution) / 2.0f) * m_TileSize / static_cast<float>(m_WaveResolution) - sign * m_Lambda * m_FFTWData.out_D_x[index][0],
-                        sign * m_FFTWData.out_height[index][0],
-                        (static_cast<float>(m) - static_cast<float>(m_WaveResolution) / 2.0f) * m_TileSize / static_cast<float>(m_WaveResolution) - sign * m_Lambda * m_FFTWData.out_D_z[index][0]);
+                    (static_cast<float>(n) - static_cast<float>(m_WaveResolution) / 2.0f) * m_TileSize / static_cast<float>(m_WaveResolution) - sign * m_Lambda * m_FFTWData.out_D_x[index][0],
+                    sign * m_FFTWData.out_height[index][0],
+                    (static_cast<float>(m) - static_cast<float>(m_WaveResolution) / 2.0f) * m_TileSize / static_cast<float>(m_WaveResolution) - sign * m_Lambda * m_FFTWData.out_D_z[index][0]);
             }
         }
     });
@@ -107,7 +106,7 @@ void FFTWave::buildHeightField(float time)
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void FFTWave::getHeightFieldMinMax(float& minValue, float& maxValue)
 {
-    static HeightFieldMinMax hfMM(m_HeightField);
+    HeightFieldMinMax hfMM(m_HeightField);
     tbb::parallel_reduce(tbb::blocked_range<size_t>(0, m_HeightField.size()), hfMM);
 
     minValue = hfMM.result_min;
@@ -122,10 +121,19 @@ void FFTWave::setWaveResolution(int waveResolution)
 
     m_HeightField.resize(m_kNum);
     m_NormalField.resize(m_kNum);
+
+    if(m_FFTWData.initialize)
+    {
+        deallocateFFTWMemory();
+        allocateFFTWMemory();
+
+        destroyFFTWPlans();
+        createFFTWPlans();
+    }
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-void FFTWave::setTileResolution(float tileResolution)
+void FFTWave::setTileSize(float tileResolution)
 {
     m_TileSize = tileResolution;
 }
@@ -146,8 +154,11 @@ void FFTWave::setWaveAmplitude(float waveAmplitude)
 void FFTWave::setNumThreads(int numThreads)
 {
     m_NumThreads = numThreads;
-    tbb::task_scheduler_init init(tbb::task_scheduler_init::automatic);
-    (void)init;
+    m_TBBinit.terminate();
+    m_TBBinit.initialize(m_NumThreads);
+
+    destroyFFTWPlans();
+    createFFTWPlans();
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -245,6 +256,8 @@ void FFTWave::initFFTW()
 
     allocateFFTWMemory();
     createFFTWPlans();
+
+    m_FFTWData.initialize = true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -259,7 +272,7 @@ void FFTWave::shutdownFFTW()
 inline Vec2f FFTWave::compute_kvec(int m, int n) const
 {
     return Vec2f(2 * M_PI * (static_cast<float>(m) - static_cast<float>(m_WaveResolution) / 2.0f) / m_TileSize,
-            2 * M_PI * (static_cast<float>(n) - static_cast<float>(m_WaveResolution) / 2.0f) / m_TileSize);
+                 2 * M_PI * (static_cast<float>(n) - static_cast<float>(m_WaveResolution) / 2.0f) / m_TileSize);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

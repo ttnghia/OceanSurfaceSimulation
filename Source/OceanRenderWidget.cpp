@@ -37,15 +37,53 @@ void OceanRenderWidget::setSkyBoxTexture(int texIndex)
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+void OceanRenderWidget::reloadTextures()
+{
+    makeCurrent();
+    m_SkyBoxRender->clearTextures();
+    m_SkyBoxRender->loadTextures(QDir::currentPath() + "/Textures/Sky/");
+    doneCurrent();
+
+    ////////////////////////////////////////////////////////////////////////////////
+    QMessageBox::information(this, "Info", "Textures reloaded!");
+}
+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void OceanRenderWidget::setWaveResolution(int resolution)
 {
     m_WaveResolution = resolution;
+
+    ////////////////////////////////////////////////////////////////////////////////
+    unsigned int M = m_WaveResolution;
+    unsigned int N = m_WaveResolution;
+    indexSize = (N - 1) * (M - 1) * 6;
+    unsigned int p = 0;
+
+    std::vector<GLuint> indices(indexSize);
+
+    for(unsigned int j = 0; j < N - 1; j++)
+    {
+        for(unsigned int i = 0; i < M - 1; i++)
+        {
+            indices[p++] = i + j * N;
+            indices[p++] = (i + 1) + j * N;
+            indices[p++] = i + (j + 1) * N;
+
+            indices[p++] = (i + 1) + j * N;
+            indices[p++] = (i + 1) + (j + 1) * N;
+            indices[p++] = i + (j + 1) * N;
+        }
+    }
+
+    assert(m_RDataWave.surfaceMesh != nullptr);
+    m_RDataWave.surfaceMesh->setElementIndex(indices);
+    m_WaveModel->setWaveResolution(resolution);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void OceanRenderWidget::setTimeStep(int timeStep)
 {
-    m_TimeStep = static_cast<float>(timeStep) / 100.0f;
+    m_TimeStep = static_cast<float>(timeStep) / 1000.0f;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -53,6 +91,21 @@ void OceanRenderWidget::updateLights()
 {
     makeCurrent();
     m_Lights->uploadDataToGPU();
+    doneCurrent();
+}
+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+void OceanRenderWidget::tooglePause()
+{
+    m_bPause = !m_bPause;
+}
+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+void OceanRenderWidget::setSurfaceMaterial(const Material::MaterialData& material)
+{
+    makeCurrent();
+    m_RDataWave.surfaceMaterial->setMaterial(material);
+    m_RDataWave.surfaceMaterial->uploadDataToGPU();
     doneCurrent();
 }
 
@@ -70,9 +123,6 @@ void OceanRenderWidget::initOpenGL()
 //    lightingShader->link();
 }
 
-
-
-
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void OceanRenderWidget::renderOpenGL()
 {
@@ -81,8 +131,11 @@ void OceanRenderWidget::renderOpenGL()
 
     ////////////////////////////////////////////////////////////////////////////////
     static float ftime = 0;
-    ftime += m_TimeStep;
-    updateWave(ftime);
+    if(!m_bPause)
+    {
+        ftime += m_TimeStep;
+        updateWave(ftime);
+    }
     renderWave();
 }
 
@@ -159,7 +212,6 @@ void OceanRenderWidget::initRDataWave()
         }
     }
 
-
     m_RDataWave.surfaceMesh = std::make_shared<MeshObject>();
     m_RDataWave.surfaceMesh->setVertices(vertices);
     m_RDataWave.surfaceMesh->setVertexNormal(normals);
@@ -171,6 +223,9 @@ void OceanRenderWidget::initRDataWave()
 
     m_RDataWave.surfaceRender = std::make_unique<MeshRender>(m_RDataWave.surfaceMesh, m_Camera, m_Lights, m_RDataWave.surfaceMaterial, m_UBufferCamData);
     m_RDataWave.surfaceRender->transform(glm::vec3(0), glm::vec3(m_ModelScale));
+
+    ////////////////////////////////////////////////////////////////////////////////
+    m_RDataWave.initialized = true;
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -184,11 +239,7 @@ void OceanRenderWidget::updateWave(float ftime)
     m_RDataWave.surfaceMesh->setVertices((void*)heightField.data(), heightField.size() * sizeof(glm::vec3));
     m_RDataWave.surfaceMesh->setVertexNormal((void*)normalField.data(), normalField.size() * sizeof(glm::vec3));
     m_RDataWave.surfaceMesh->uploadDataToGPU();
-
-    ////////////////////////////////////////////////////////////////////////////////
-    m_RDataWave.initialized = true;
 }
-
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void OceanRenderWidget::renderWave()

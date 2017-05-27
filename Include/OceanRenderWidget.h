@@ -39,15 +39,19 @@ public:
 
 public slots:
     void setSkyBoxTexture(int texIndex);
+    void reloadTextures();
     void setWaveResolution(int resolution);
     void setTimeStep(int timeStep);
     void updateLights();
+    void tooglePause();
+    void setSurfaceMaterial(const Material::MaterialData& material);
 
 signals:
     void lightsObjChanged(const std::shared_ptr<PointLights>& lights);
 
 protected:
     virtual void initOpenGL() override;
+    virtual void resizeOpenGLWindow(int, int) override {}
     virtual void renderOpenGL() override;
 
 private:
@@ -62,10 +66,10 @@ private:
     ////////////////////////////////////////////////////////////////////////////////
     struct
     {
-        std::shared_ptr<QtAppShaderProgram> shader;
-        std::shared_ptr<MeshObject>         surfaceMesh;
-        std::shared_ptr<Material>           surfaceMaterial;
-        std::unique_ptr<MeshRender>         surfaceRender;
+        std::shared_ptr<QtAppShaderProgram> shader          = nullptr;
+        std::shared_ptr<MeshObject>         surfaceMesh     = nullptr;
+        std::shared_ptr<Material>           surfaceMaterial = nullptr;
+        std::unique_ptr<MeshRender>         surfaceRender   = nullptr;
 
         bool initialized = false;
     } m_RDataWave;
@@ -75,12 +79,13 @@ private:
     void renderWave();
 
     ////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<FFTWave> m_WaveModel = std::make_shared<FFTWave>(DEFAULT_TILE_SIZE, DEFAULT_WAVE_RESOLUTION, DEFAULT_WAVE_AMPLITUDE, DEFAULT_WIN_DIRECTION, DEFAULT_WIN_SPEED, 1.0f, 4);
+    std::shared_ptr<FFTWave> m_WaveModel = std::make_shared<FFTWave>(DEFAULT_TILE_SIZE, DEFAULT_WAVE_RESOLUTION, DEFAULT_WAVE_AMPLITUDE, DEFAULT_WIN_DIRECTION, DEFAULT_WIN_SPEED, 1.0f);
 
     QtAppShaderProgram* lightingShader;
 
     int   m_WaveResolution = DEFAULT_WAVE_RESOLUTION;
     float m_TimeStep       = DEFAULT_TIMESTEP;
+    bool  m_bPause         = false;
 
     ////////////////////////////////////////////////////////////////////////////////
     // => rendering variable

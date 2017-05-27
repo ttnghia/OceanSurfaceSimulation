@@ -95,7 +95,7 @@ void Controller::setupColorControllers(QBoxLayout* ctrLayout)
 void Controller::setupWaveControllers(QBoxLayout* ctrLayout)
 {
     m_sldWaveResolution = new EnhancedSlider;
-    m_sldWaveResolution->setRange(1, 4096);
+    m_sldWaveResolution->setRange(1, 1024);
     m_sldWaveResolution->setValue(DEFAULT_WAVE_RESOLUTION);
     m_sldWaveResolution->setTracking(false);
 
@@ -113,19 +113,17 @@ void Controller::setupWaveControllers(QBoxLayout* ctrLayout)
 
     ////////////////////////////////////////////////////////////////////////////////
     m_sldTimeStep = new EnhancedSlider;
-    m_sldTimeStep->setRange(0, 100);
-    m_sldTimeStep->setValue(static_cast<int>(DEFAULT_TIMESTEP * 100));
+    m_sldTimeStep->setRange(0, 1000);
+    m_sldTimeStep->setValue(static_cast<int>(DEFAULT_TIMESTEP * 1000));
     m_sldTimeStep->setTracking(false);
     QGridLayout* timestepLayout = new QGridLayout;
     timestepLayout->addLayout(m_sldTimeStep->getLayout(), 0, 0, 1, 5);
-    timestepLayout->addWidget(new QLabel("/ 100"), 0, 5, 1, 1);
-
-    QGroupBox* timestepGroup = new QGroupBox("Timestep (second)");
+    QGroupBox* timestepGroup = new QGroupBox("Timestep (millisecond)");
     timestepGroup->setLayout(timestepLayout);
 
     ////////////////////////////////////////////////////////////////////////////////
     m_sldNumThreads = new EnhancedSlider;
-    m_sldNumThreads->setRange(0, 16);
+    m_sldNumThreads->setRange(1, 16);
     m_sldNumThreads->setValue(DEFAULT_NUM_THREADS);
     m_sldNumThreads->setTracking(false);
 

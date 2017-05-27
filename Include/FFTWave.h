@@ -36,29 +36,20 @@ class FFTWave : public QObject
 public:
     // mesh resolution: resolution of the height field
     // tile resolution:  the actual size of the grid (in meters)
-    FFTWave(float tileSize, int waveResolution, float waveAmplitude, const Vec2f& windDirection, float windSpeed, float lambda, int numthreads);
+    FFTWave(float tileSize, int waveResolution, float waveAmplitude, const Vec2f& windDirection, float windSpeed, float lambda);
     ~FFTWave()
     {
         shutdownFFTW();
     }
 
     void buildHeightField(float time);
-
-    const std::vector<glm::vec3>& getHeightField()
-    {
-        return m_HeightField;
-    }
-
-    const std::vector<glm::vec3>& getNormalField()
-    {
-        return m_NormalField;
-    }
-
+    const std::vector<glm::vec3>& getHeightField() const noexcept { return m_HeightField; }
+    const std::vector<glm::vec3>& getNormalField() const noexcept { return m_NormalField; }
     void getHeightFieldMinMax(float& minValue, float& maxValue);
 
 public slots:
     void setWaveResolution(int waveResolution);
-    void setTileResolution(float tileResolution);
+    void setTileSize(float tileResolution);
     void setWinSpeed(float winSpeed);
     void setWaveAmplitude(float waveAmplitude);
     void setNumThreads(int numThreads);
@@ -81,7 +72,9 @@ private:
     ////////////////////////////////////////////////////////////////////////////////
     std::vector<glm::vec3> m_HeightField;
     std::vector<glm::vec3> m_NormalField;
-    int                    m_NumThreads;
+
+    int m_NumThreads = DEFAULT_NUM_THREADS;
+    tbb::task_scheduler_init m_TBBinit{DEFAULT_NUM_THREADS };
 
     float m_TileSize;
     int   m_WaveResolution;
@@ -114,6 +107,8 @@ private:
         fftwf_complex* out_height, * out_slope_x, * out_slope_z, * out_D_x, * out_D_z;
 
         fftwf_plan p_height, p_slope_x, p_slope_z, p_D_x, p_D_z;
+
+        bool initialize = false;
     } m_FFTWData;
 };
 

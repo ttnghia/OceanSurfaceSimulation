@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <BananaCore/TypeNames.h>
+#include <Banana/TypeNames.h>
 
-#define DEFAULT_WAVE_RESOLUTION 10
+#define DEFAULT_WAVE_RESOLUTION 16
 #define DEFAULT_WAVE_AMPLITUDE  1e-6
 #define DEFAULT_WIN_SPEED       1000.0f
 #define DEFAULT_WIN_DIRECTION   Vec2f(1.0f, 1.0f)
@@ -27,7 +27,7 @@
 
 #define DEFAULT_SUN_DIRECTION   glm::normalize(Vec3f(0.0f, 1.0f, -2.0f))
 #define DEFAULT_SUN_COLOR       Vec3f(1.0f, 1.0f, 1.0f)
-#define DEFAULT_SEA_COLOR       Vec3f(0.0f, 0.0, 0.5)
+#define DEFAULT_SEA_COLOR       Vec3f(0.0f, 0.64, 0.68)
 #define DEFAULT_TIMESTEP        0.2f
 
 #ifndef M_PI

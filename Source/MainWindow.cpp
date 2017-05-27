@@ -61,15 +61,23 @@ void MainWindow::connectWidgets()
 {
     ////////////////////////////////////////////////////////////////////////////////
     // textures
-    connect(m_Controller->m_cbSkyTexture->getComboBox(), SIGNAL(currentIndexChanged(int)), m_RenderWidget, SLOT(setSkyBoxTexture(int)));
+    connect(m_Controller->m_cbSkyTexture->getComboBox(), SIGNAL(currentIndexChanged(int)),                m_RenderWidget, SLOT(setSkyBoxTexture(int)));
+    connect(m_Controller->m_btnReloadTextures,           SIGNAL(clicked(bool)),                           m_RenderWidget, SLOT(reloadTextures()));
+    connect(m_Controller->m_msSurfaceMaterial,           SIGNAL(materialChanged(Material::MaterialData)), m_RenderWidget, SLOT(setSurfaceMaterial(Material::MaterialData)));
 
     ////////////////////////////////////////////////////////////////////////////////
     // wave
-    connect(m_Controller->m_sldWaveResolution->getSlider(), &QSlider::valueChanged, m_WaveModel.get(), &FFTWave::setWaveResolution);
+    connect(m_Controller->m_sldWaveResolution->getSlider(), &QSlider::valueChanged, m_RenderWidget,    &OceanRenderWidget::setWaveResolution);
+    connect(m_Controller->m_sldTileSize->getSlider(),       &QSlider::valueChanged, m_WaveModel.get(), &FFTWave::setTileSize);
     connect(m_Controller->m_sldTimeStep->getSlider(),       &QSlider::valueChanged, m_RenderWidget,    &OceanRenderWidget::setTimeStep);
+    connect(m_Controller->m_sldNumThreads->getSlider(),     &QSlider::valueChanged, m_WaveModel.get(), &FFTWave::setNumThreads);
 
     ////////////////////////////////////////////////////////////////////////////////
     // lights
     connect(m_Controller->m_LightEditor, &PointLightEditor::lightsChanged,     m_RenderWidget,              &OceanRenderWidget::updateLights);
     connect(m_RenderWidget,              &OceanRenderWidget::lightsObjChanged, m_Controller->m_LightEditor, &PointLightEditor::setLights);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // buttons
+    connect(m_Controller->m_btnPause, &QPushButton::clicked, m_RenderWidget, &OceanRenderWidget::tooglePause);
 }
