@@ -19,16 +19,12 @@
 
 #include <Banana/TypeNames.h>
 
-#define DEFAULT_WAVE_RESOLUTION 16
-#define DEFAULT_WAVE_AMPLITUDE  1e-6
-#define DEFAULT_WIN_SPEED       1000.0f
+#define DEFAULT_WAVE_RESOLUTION 128
+#define DEFAULT_WIN_SPEED       100.0f
 #define DEFAULT_WIN_DIRECTION   Vec2f(1.0f, 1.0f)
 #define DEFAULT_TILE_SIZE       1000.0f
 
-#define DEFAULT_SUN_DIRECTION   glm::normalize(Vec3f(0.0f, 1.0f, -2.0f))
-#define DEFAULT_SUN_COLOR       Vec3f(1.0f, 1.0f, 1.0f)
-#define DEFAULT_SEA_COLOR       Vec3f(0.0f, 0.64, 0.68)
-#define DEFAULT_TIMESTEP        0.2f
+#define DEFAULT_TIMESTEP        0.1f
 
 #ifndef M_PI
 #define M_PI                    3.14159265358979323846f
@@ -36,14 +32,14 @@
 
 #define GRAVITY                 9.8f
 #define WAVE_LENGTH             0.1f
+#define WAVE_AMPLITUDE          1e-6
 
-
-#define DEFAULT_SURFACE_MATERIAL           \
-    {                                      \
-        glm::vec4(0.2 * 0.2),              \
-        glm::vec4(0.0f, 0.0f, 0.5f, 1.0f), \
-        glm::vec4(1),                      \
-        250.0,                             \
-        std::string("SurfaceMaterial")     \
+#define DEFAULT_SURFACE_MATERIAL               \
+    {                                          \
+        glm::vec4(0.2 * 0.2),                  \
+        glm::vec4(0.0f, 0.745f, 0.784f, 1.0f), \
+        glm::vec4(1),                          \
+        250.0,                                 \
+        std::string("SurfaceMaterial")         \
     }
-#define DEFAULT_NUM_THREADS 4
+#define DEFAULT_NUM_THREADS     4

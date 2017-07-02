@@ -51,6 +51,7 @@ private:
     QPushButton*      m_btnReloadTextures;
     EnhancedSlider*   m_sldWaveResolution;
     EnhancedSlider*   m_sldTileSize;
+    EnhancedSlider*   m_sldWindSpeed;
     EnhancedSlider*   m_sldTimeStep;
     EnhancedSlider*   m_sldNumThreads;
 

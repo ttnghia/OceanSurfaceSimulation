@@ -40,5 +40,3 @@ macx {
 win32 {
     LIBS += -llibfftw3f-3 -L$$PWD/Externals/fftw-3.3.5/lib
 }
-
-RESOURCES += Shaders.qrc

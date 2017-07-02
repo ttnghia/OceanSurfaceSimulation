@@ -79,9 +79,7 @@ private:
     void renderWave();
 
     ////////////////////////////////////////////////////////////////////////////////
-    std::shared_ptr<FFTWave> m_WaveModel = std::make_shared<FFTWave>(DEFAULT_TILE_SIZE, DEFAULT_WAVE_RESOLUTION, DEFAULT_WAVE_AMPLITUDE, DEFAULT_WIN_DIRECTION, DEFAULT_WIN_SPEED, 1.0f);
-
-    QtAppShaderProgram* lightingShader;
+    std::shared_ptr<FFTWave> m_WaveModel = std::make_shared<FFTWave>(DEFAULT_TILE_SIZE, DEFAULT_WAVE_RESOLUTION, DEFAULT_WIN_DIRECTION, DEFAULT_WIN_SPEED, 1.0f);
 
     int   m_WaveResolution = DEFAULT_WAVE_RESOLUTION;
     float m_TimeStep       = DEFAULT_TIMESTEP;
@@ -89,18 +87,8 @@ private:
 
     ////////////////////////////////////////////////////////////////////////////////
     // => rendering variable
-    int indexSize;
-
-    float m_ModelScale = 0.01f;
     float m_HeightMax;
     float m_HeightMin;
-
-
-    // Light attributes
-    glm::vec3 m_SunDirection = DEFAULT_SUN_DIRECTION;
-    glm::vec3 lampPos        = m_SunDirection * 50.0f;
-    glm::vec3 m_SunColor     = DEFAULT_SUN_COLOR;
-    glm::vec3 m_SeaColor     = DEFAULT_SEA_COLOR;
 
     std::shared_ptr<PointLights>      m_Lights;
     std::unique_ptr<SkyBoxRender>     m_SkyBoxRender = nullptr;

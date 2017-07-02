@@ -20,7 +20,8 @@
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 OceanRenderWidget::OceanRenderWidget(QWidget* parent) : OpenGLWidget(parent)
 {
-    m_Camera->setDefaultCamera(glm::vec3(0.95, 4.35, 8.58), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    m_Camera->setFrustum(45.0f, 1.0f, 10000.0f);
+    m_Camera->setDefaultCamera(glm::vec3(100, 500, 900), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -54,12 +55,13 @@ void OceanRenderWidget::setWaveResolution(int resolution)
     m_WaveResolution = resolution;
 
     ////////////////////////////////////////////////////////////////////////////////
-    unsigned int M = m_WaveResolution;
-    unsigned int N = m_WaveResolution;
-    indexSize = (N - 1) * (M - 1) * 6;
-    unsigned int p = 0;
+    unsigned int M         = m_WaveResolution;
+    unsigned int N         = m_WaveResolution;
+    unsigned int p         = 0;
+    auto         indexSize = (N - 1) * (M - 1) * 6;
 
-    std::vector<GLuint> indices(indexSize);
+    static std::vector<GLuint> indices;
+    indices.resize(indexSize);
 
     for(unsigned int j = 0; j < N - 1; j++)
     {
@@ -115,12 +117,6 @@ void OceanRenderWidget::initOpenGL()
     initRDataSkyBox();
     initRDataLight();
     initRDataWave();
-
-//    lightingShader = new QtAppShaderProgram;
-
-//    lightingShader->addVertexShaderFromResource(":/Shaders/surface.vert");
-//    lightingShader->addFragmentShaderFromResource(":/Shaders/surface.frag");
-//    lightingShader->link();
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -134,6 +130,8 @@ void OceanRenderWidget::renderOpenGL()
     if(!m_bPause)
     {
         ftime += m_TimeStep;
+        if(ftime > 1000.0f)
+            ftime = 0;
         updateWave(ftime);
     }
     renderWave();
@@ -145,8 +143,8 @@ void OceanRenderWidget::initRDataLight()
     m_Lights = std::make_shared<PointLights>();
     m_Lights->setNumLights(1);
 
-    m_Lights->setLightPosition(glm::vec4(0, 100, -100, 1.0), 0);
-    m_Lights->setLightDiffuse(glm::vec4(0.7), 0);
+    m_Lights->setLightPosition(glm::vec4(0, 1000, -1000, 1.0), 0);
+    m_Lights->setLightDiffuse(glm::vec4(1.0), 0);
 
     m_Lights->setSceneCenter(glm::vec3(0, 0, 0));
     m_Lights->setLightViewPerspective(30);
@@ -169,6 +167,7 @@ void OceanRenderWidget::initRDataSkyBox()
     Q_ASSERT(m_UBufferCamData != nullptr);
 
     m_SkyBoxRender = std::make_unique<SkyBoxRender>(m_Camera, QDir::currentPath() + "/Textures/Sky/", m_UBufferCamData);
+    m_SkyBoxRender->scale(10.0, 10.0, 10.0);
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -183,20 +182,21 @@ void OceanRenderWidget::initRDataWave()
 {
     assert(isValid());
 
-    unsigned int M = m_WaveResolution;
-    unsigned int N = m_WaveResolution;
-    indexSize = (N - 1) * (M - 1) * 6;
-    unsigned int p = 0;
+    unsigned int M         = m_WaveResolution;
+    unsigned int N         = m_WaveResolution;
+    unsigned int p         = 0;
+    auto         indexSize = (N - 1) * (M - 1) * 6;
 
-    std::vector<GLfloat> vertices(indexSize);
-    std::vector<GLfloat> normals(indexSize);
-    std::vector<GLuint>  indices(indexSize);
+    static std::vector<GLfloat> vertices;
+    static std::vector<GLfloat> normals;
+    static std::vector<GLuint>  indices;
 
-    for(int i = 0; i < m_WaveResolution * m_WaveResolution; ++i)
-    {
-        vertices[i] = 0;
-        normals[i]  = 0;
-    }
+    vertices.resize(indexSize);
+    normals.resize(indexSize);
+    indices.resize(indexSize);
+
+    vertices.assign(vertices.size(), 0);
+    normals.assign(vertices.size(), 0);
 
     for(unsigned int j = 0; j < N - 1; j++)
     {
@@ -222,7 +222,6 @@ void OceanRenderWidget::initRDataWave()
     m_RDataWave.surfaceMaterial->uploadDataToGPU();
 
     m_RDataWave.surfaceRender = std::make_unique<MeshRender>(m_RDataWave.surfaceMesh, m_Camera, m_Lights, m_RDataWave.surfaceMaterial, m_UBufferCamData);
-    m_RDataWave.surfaceRender->transform(glm::vec3(0), glm::vec3(m_ModelScale));
 
     ////////////////////////////////////////////////////////////////////////////////
     m_RDataWave.initialized = true;
@@ -246,49 +245,4 @@ void OceanRenderWidget::renderWave()
 {
     assert(m_RDataWave.initialized);
     m_RDataWave.surfaceRender->render();
-
-
-//    GLint lightPosLoc = glGetUniformLocation(lightingShader->getProgramID(), "light.position");
-//    GLint viewPosLoc  = glGetUniformLocation(lightingShader->getProgramID(), "viewPos");
-//    glUniform3f(lightPosLoc, lampPos.x,                       lampPos.y,                       lampPos.z);
-//    glUniform3f(viewPosLoc,  m_Camera->getCameraPosition().x, m_Camera->getCameraPosition().y, m_Camera->getCameraPosition().z);
-//    glUniform1f(glGetUniformLocation(lightingShader->getProgramID(), "heightMin"),
-//            m_HeightMin * m_ModelScale);
-//    glUniform1f(glGetUniformLocation(lightingShader->getProgramID(), "heightMax"),
-//            m_HeightMax * m_ModelScale);
-
-//    // Set lights properties
-//    glUniform3f(glGetUniformLocation(lightingShader->getProgramID(), "light.ambient"),  1.0f, 1.0f,
-//            1.0f);
-//    glUniform3f(glGetUniformLocation(lightingShader->getProgramID(), "light.diffuse"),  1.0f, 1.0f,
-//            1.0f);
-//    glUniform3f(glGetUniformLocation(lightingShader->getProgramID(), "light.specular"), 1.0f, 0.9f,
-//            0.7f);
-//    // Set material properties
-//    glUniform1f(glGetUniformLocation(lightingShader->getProgramID(), "material.shininess"), 32.0f);
-
-//    // Create camera transformations
-////    glm::mat4 view = glm::mat4(1.0);
-//    glm::mat4 view       = m_Camera->getViewMatrix();
-//    glm::mat4 projection = m_Camera->getProjectionMatrix();
-//    // Get the uniform locations
-//    GLint modelLoc = glGetUniformLocation(lightingShader->getProgramID(), "model");
-//    GLint viewLoc  = glGetUniformLocation(lightingShader->getProgramID(), "view");
-//    GLint projLoc  = glGetUniformLocation(lightingShader->getProgramID(), "projection");
-//    // Pass the matrices to the shader
-//    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-//    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-//    // ===== Draw Model =====
-//    glBindVertexArray(surfaceVAO);
-//    glm::mat4 model;
-//    model = glm::mat4();
-//    model = glm::scale(model, glm::vec3(m_ModelScale));   // Scale the surface
-//    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//    glDrawElements(GL_TRIANGLES, indexSize, GL_UNSIGNED_INT, 0);
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//    glDrawElements(GL_TRIANGLES, indexSize, GL_UNSIGNED_INT, 0);
-//    glBindVertexArray(0);
 }

@@ -32,6 +32,7 @@ public:
 
 protected:
     virtual void instantiateOpenGLWidget();
+    virtual bool processKeyPressEvent(QKeyEvent* event) override;
 
 private:
     void setupRenderWidgets();

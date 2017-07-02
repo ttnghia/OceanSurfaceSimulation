@@ -104,12 +104,21 @@ void Controller::setupWaveControllers(QBoxLayout* ctrLayout)
 
     ////////////////////////////////////////////////////////////////////////////////
     m_sldTileSize = new EnhancedSlider;
-    m_sldTileSize->setRange(1, 10000);
+    m_sldTileSize->setRange(1, 1000);
     m_sldTileSize->setValue(DEFAULT_TILE_SIZE);
     m_sldTileSize->setTracking(false);
 
     QGroupBox* tileSizeGroup = new QGroupBox("Tile Size (meter)");
     tileSizeGroup->setLayout(m_sldTileSize->getLayout());
+
+    ////////////////////////////////////////////////////////////////////////////////
+    m_sldWindSpeed = new EnhancedSlider;
+    m_sldWindSpeed->setRange(1, 1000);
+    m_sldWindSpeed->setValue(static_cast<int>(DEFAULT_WIN_SPEED));
+    m_sldWindSpeed->setTracking(false);
+
+    QGroupBox* windSpeedGroup = new QGroupBox("Win Speed (m/s)");
+    windSpeedGroup->setLayout(m_sldWindSpeed->getLayout());
 
     ////////////////////////////////////////////////////////////////////////////////
     m_sldTimeStep = new EnhancedSlider;
@@ -133,6 +142,7 @@ void Controller::setupWaveControllers(QBoxLayout* ctrLayout)
     ////////////////////////////////////////////////////////////////////////////////
     ctrLayout->addWidget(waveResolutionGroup);
     ctrLayout->addWidget(tileSizeGroup);
+    ctrLayout->addWidget(windSpeedGroup);
     ctrLayout->addWidget(timestepGroup);
     ctrLayout->addWidget(numThreadGroup);
 }

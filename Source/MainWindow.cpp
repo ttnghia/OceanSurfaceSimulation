@@ -43,6 +43,21 @@ void MainWindow::instantiateOpenGLWidget()
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+bool MainWindow::processKeyPressEvent(QKeyEvent* event)
+{
+    switch(event->key())
+    {
+        case Qt::Key_Space:
+            m_Controller->m_btnPause->click();
+            return true;
+
+        ////////////////////////////////////////////////////////////////////////////////
+        default:
+            return OpenGLMainWindow::processKeyPressEvent(event);
+    }
+}
+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 void MainWindow::setupRenderWidgets()
 {
     m_Controller = new Controller(this);
@@ -69,6 +84,7 @@ void MainWindow::connectWidgets()
     // wave
     connect(m_Controller->m_sldWaveResolution->getSlider(), &QSlider::valueChanged, m_RenderWidget,    &OceanRenderWidget::setWaveResolution);
     connect(m_Controller->m_sldTileSize->getSlider(),       &QSlider::valueChanged, m_WaveModel.get(), &FFTWave::setTileSize);
+    connect(m_Controller->m_sldWindSpeed->getSlider(),      &QSlider::valueChanged, m_WaveModel.get(), &FFTWave::setWinSpeed);
     connect(m_Controller->m_sldTimeStep->getSlider(),       &QSlider::valueChanged, m_RenderWidget,    &OceanRenderWidget::setTimeStep);
     connect(m_Controller->m_sldNumThreads->getSlider(),     &QSlider::valueChanged, m_WaveModel.get(), &FFTWave::setNumThreads);
 

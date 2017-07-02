@@ -36,7 +36,7 @@ class FFTWave : public QObject
 public:
     // mesh resolution: resolution of the height field
     // tile resolution:  the actual size of the grid (in meters)
-    FFTWave(float tileSize, int waveResolution, float waveAmplitude, const Vec2f& windDirection, float windSpeed, float lambda);
+    FFTWave(float tileSize, int waveResolution, const Vec2f& windDirection, float windSpeed, float lambda);
     ~FFTWave()
     {
         shutdownFFTW();
@@ -49,9 +49,8 @@ public:
 
 public slots:
     void setWaveResolution(int waveResolution);
-    void setTileSize(float tileResolution);
+    void setTileSize(float tileSize);
     void setWinSpeed(float winSpeed);
-    void setWaveAmplitude(float waveAmplitude);
     void setNumThreads(int numThreads);
 
 private:
@@ -62,11 +61,12 @@ private:
     void initFFTW();
     void shutdownFFTW();
 
-    inline Vec2f               compute_kvec(int m, int n) const;
-    inline float               func_omega(float k) const;
-    inline float               func_P_h(const Vec2f& vec_k) const;
-    inline std::complex<float> func_h_twiddle_0(const Vec2f& vec_k);
-    inline std::complex<float> func_h_twiddle(int kn, int km, float t) const;
+    Vec2f               compute_kvec(int m, int n) const;
+    float               func_omega(float k) const;
+    float               func_P_h(const Vec2f& vec_k) const;
+    void                init_value_h_twiddle_0();
+    std::complex<float> func_h_twiddle_0(const Vec2f& vec_k);
+    std::complex<float> func_h_twiddle(int kn, int km, float t) const;
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,6 @@ private:
 
     float m_TileSize;
     int   m_WaveResolution;
-    float m_WaveAmplitude;
     int   m_kNum;
     Vec2f m_WindDirection;
     float m_WinSpeed;
