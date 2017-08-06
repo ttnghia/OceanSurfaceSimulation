@@ -19,3 +19,9 @@
 ![3](Captured/3.JPG)
 
 ![4](Captured/4.JPG)
+
+---
+
+# References
+
+The computation code in my program is adapted from this repository: [https://github.com/ZijinZheng/OceanSurface](https://github.com/ZijinZheng/OceanSurface)
